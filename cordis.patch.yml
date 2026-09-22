@@ -1,0 +1,69 @@
+# Bundle patch for dsh-mimo-adapter.
+#
+# Applied when this package is listed in a profile's `dsh.profile.bundles`, or
+# copied verbatim into a profile's own `cordis.patch.yml` when the plugin is
+# installed as a plain loader row.
+#
+# The defaults below are the official values, so an empty `config:` is already a
+# working deployment against the public MiMo endpoint once `MIMO_API_KEY` holds
+# a key. Every field is documented in README.md §2 and the few remaining
+# unknowns are listed in docs/PENDING-CONFIRMATION.md.
+- insert:
+    - id: mimo-adapter
+      name: 'dsh-mimo-adapter'
+      config:
+        # `xiaomi` is the provider; MiMo is the model family it serves.
+        # Registering a second route named `mimo` would list one vendor
+        # twice and read a separate credential reference.
+        provider: xiaomi
+        displayName: Xiaomi
+        # Official OpenAI-compatible root (first-api-call doc).
+        baseURL: https://api.xiaomimimo.com/v1
+        path: /chat/completions
+        # Official transport: the `api-key` header, not `Authorization: Bearer`.
+        auth:
+          scheme: header
+          headerName: api-key
+        apiKeyEnv: XIAOMI_API_KEY
+        # Reasoning effort (思考强度). MiMo documents one switch,
+        # `thinking.type`, with `enabled` / `disabled`, and enables deep
+        # thinking by default — so `high` means "thinking on", not a level.
+        # A deployment that finds a documented level parameter overrides
+        # `efforts` and both field names here.
+        defaultEffort: high
+        # efforts:
+        #   - id: off
+        #     name: Off
+        #     inert: true
+        #     thinking: { type: disabled }
+        #   - id: low
+        #     name: Low
+        #     thinking: { type: enabled }
+        #   - id: high
+        #     name: Deep thinking
+        #     thinking: { type: enabled }
+        # The official catalog ships in lib/config.js; override `models` to
+        # narrow it or to add a gateway's own ids.
+        # models:
+        #   - id: mimo-v2.6-pro
+        #     inputModalities: [text, image, audio, video]
+        # Audio input: `{ type: input_audio, input_audio: { data } }` with a
+        # data URI. Official URL-path cap is 100 MB. Container list is
+        # 待补充 (wav appears in the doc examples).
+        # audio:
+        #   enabled: true
+        #   mode: input_audio
+        #   onOversize: degrade
+        #   maxBytes: 104857600
+        #   maxPerRequest: 1
+        # Video input: `{ type: video_url, video_url: { url }, fps,
+        # media_resolution }` with a data URI. Official Base64 cap is 50 MB for
+        # the encoded string; containers are MP4, MOV, AVI, WMV.
+        # video:
+        #   enabled: true
+        #   mode: video_url
+        #   onOversize: degrade
+        #   fps: 2
+        #   mediaResolution: default
+        #   maxBytes: 52428800
+        #   maxPerRequest: 1
